@@ -137,3 +137,24 @@ project seed → unnumbered baseline artifacts). Specialization: `sdlc-for-agent
 - **Execution outcome:** Human User reported "no stocks back". Diagnosed: the API, submit handler, and rendering all work (verified in-page: `/api/recommend` → 200 grounded watchlist; `requestSubmit`/forced click render 5 entries). Root cause was **scale-to-zero cold start** — `minReplicas: 0` + 300s cooldown meant the app deactivated after idle, so the next click hit a 20–40s cold start (Agent Framework import + first model call) and looked like a hang. Fix: `minReplicas: 1` (keep one replica warm) applied live via `az containerapp update` and in `infra/app.bicep` so it persists across deploys. Verified warm: `/healthz` ok, `/api/recommend` 200 in ~2–6s with 5 grounded tickers.
 - **Artifact / path changed:** `infra/app.bicep`; Azure `stock-guru-fresh` scale config.
 - **Notes:** The Playwright "normal click times out" symptom during diagnosis was a hidden-tab artifact (rAF paused when the browser tab is not visible), not an app bug — forced click and real users are unaffected. Tradeoff: one always-on replica has a small standing cost vs. scale-to-zero.
+
+## 016
+- **Stage / task:** `execute/EXECUTE-EXIT`
+- **Approval gate:** `EXECUTE-EXIT`
+- **Timestamp (UTC):** 2026-10-05T21:55:00Z
+- **Approval outcome:** Pending
+- **Execution outcome:** EXECUTE-EXIT acceptance run. **All 11 ACs verified against the live app + CI run `37375538622`:**
+  - **AC-1** T-1 schema — Unit tests (`test_movers`) green in CI. ✅
+  - **AC-2** 3–5 recs, all grounded in movers — live: 4 recs, every ticker ∈ `/api/movers` (25). ✅
+  - **AC-3** `Watchlist` schema, `confidence ∈ [0,1]`, non-empty rationale — live check passed; DIM-2 100% in CI eval. ✅
+  - **AC-4** disclaimer on every `/api/recommend` — live: present; DIM-3 100%. ✅
+  - **AC-5** rationale grounding DIM-4 ≥ 80% — CI Evaluation step green. ✅
+  - **AC-6** `/api/recommend` 200 + 422 on invalid; `/api/movers` 200 (as_of + 25); `/healthz` 200 — all live-verified. ✅
+  - **AC-7** per-request token/cost logged + fail-closed — usage/cost metering in `agent.py`; Unit tests green. ✅
+  - **AC-8** eval N ≥ 20 (cases.jsonl = 20), DIM-1/2/3 100%, DIM-4 threshold, `reports/eval/` written — CI Evaluation step green. ✅
+  - **AC-9** dashboard: profile form + cards + expandable reasoning + persistent disclaimer — live-verified + rendered-UI tests. ✅
+  - **AC-10** deployed to ACA via CI/CD over OIDC (no secrets); `/healthz` 200 at public URL. ✅
+  - **AC-11** axe-core zero critical/serious in CI (`ui` job); design-quality scan 0 findings both themes (plan §2.6); **Nielsen 10-heuristic checklist recorded** (`reports/ux/nielsen-heuristics.md`, 10/10). ✅
+  Safety suite (disclaimer-drop / invent-ticker / personalized-advice) green in CI. Awaiting Human-User EXECUTE-EXIT approval.
+- **Artifact / path changed:** `reports/ux/nielsen-heuristics.md`, `.gitignore`
+- **Notes:** All W-1..W-8 delivered; app live and healthy. This is the final baseline-buildout gate.
