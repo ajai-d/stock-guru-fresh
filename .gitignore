@@ -1,9 +1,8 @@
 __pycache__/
 *.pyc
 .venv/
-reports/
+reports/*
 !reports/ux/
-!reports/ux/**
 infra/*.json
 .env
 .github/skills/
