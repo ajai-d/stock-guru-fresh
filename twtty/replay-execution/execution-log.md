@@ -92,3 +92,12 @@ project seed → unnumbered baseline artifacts). Specialization: `sdlc-for-agent
 - **Execution outcome:** PLAN-EXIT self-verification checklist complete (§1–§3 present; required diagrams present incl. §2.6 UX flow + stateDiagram; W-4-eval + eval-first edge; identity-bootstrap first). Awaiting Human-User PLAN-EXIT approval before EXECUTE.
 - **Artifact / path changed:** `twtty/plan/plan.md`
 - **Notes:** EXECUTE reuses the live rg-stock-guru infra; deploys a new Container App (no second standing bill).
+
+## 011
+- **Stage / task:** `spec/1d` (refinement)
+- **Approval gate:** —
+- **Timestamp (UTC):** 2026-10-05T20:45:00Z
+- **Approval outcome:** Approved
+- **Execution outcome:** `spec.md §13` realigned to the methodology's requirement-dimension structure (Task efficiency / Interaction / Accessibility / Testing / Delegated-mode disclosures), matching `spec-template.md §13`. Added an explicit **§13.1 Task efficiency** requirement (previously only implied). Design-level content (design system, information architecture, wireframes, content voice) moved to its canonical home, `plan.md §2.6` (content-design voice/tone paragraph added there). §13.x cross-references updated (testing now §13.4).
+- **Artifact / path changed:** `twtty/spec/spec.md`, `twtty/plan/plan.md`
+- **Notes:** Editorial/structural realignment — no AC removed; the only new obligation is making task efficiency testable. Keeps the instance a faithful example of the methodology it exercises.

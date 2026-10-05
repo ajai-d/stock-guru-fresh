@@ -39,7 +39,7 @@ schema validity, disclaimer, cost bounding) with an automated evaluation.
 - Deployed and reachable: post-deploy `/healthz` returns 200 at the public URL.
 - UX: zero axe-core critical/serious violations; zero design-quality-scan findings
   (the bound UX/design skill) on every mockup (light + dark); Nielsen 10-heuristic
-  review passes before EXECUTE-EXIT (§13.6).
+  review passes before EXECUTE-EXIT (§13.4).
 
 ## 4. Constraints
 
@@ -150,7 +150,7 @@ flowchart LR
 - **NFR-2** App-runtime auth to Azure OpenAI uses a managed identity; no keys in
   code or config.
 - **NFR-3** The dashboard meets the UX quality bar in §13 (accessible,
-  keyboard-navigable, labeled confidence) and passes §13.6 testing.
+  keyboard-navigable, labeled confidence) and passes §13.4 testing.
 - **NFR-4** The movers feed is pluggable; a seeded feed MUST support offline/dev
   and CI without network access.
 
@@ -182,7 +182,7 @@ flowchart LR
   design-quality / anti-pattern scan reports zero findings on every primary-screen
   mockup for both the light and dark themes** (recorded in `plan.md §2.6`), and the
   Nielsen 10-heuristic review checklist is completed and recorded before
-  EXECUTE-EXIT (§13.6).
+  EXECUTE-EXIT (§13.4).
 
 ## 9. Tool schemas
 
@@ -311,71 +311,52 @@ flowchart LR
 
 ## 13. UX requirements
 
-### 13.1 Design system
+### 13.1 Task efficiency
 
-A **distinctive, professional, accessible** visual design — deliberately **not**
-a generic AI-default theme — produced through **the bound UX/design skill**
-(`reusable-assets`; named with its pinned version in `runtimeconfig.md`) following
-its full authored process. The design MUST support a **light and a dark theme**,
-each meeting WCAG 2.2 AA contrast, selectable via an in-product **mode toggle**
-that defaults to the OS preference. Design tokens (color, type, spacing, motion),
-the chosen type/palette/density, and the rendered wireframes are **produced and
-recorded in `plan.md §2.6`** — rendered, visually captured, and
-Human-User-approved, not asserted.
+The single primary task — set a profile and receive a grounded watchlist — MUST be
+completable from arrival in the minimum number of steps: one page, no splash /
+welcome / login / routing, and the profile carries sensible defaults so the user
+CAN submit immediately without mandatory configuration. Any multi-step flow or
+confirmation dialog MUST be justified by a specific user benefit; this scope has no
+destructive or irreversible actions, so none are used. Viewing a recommendation's
+reasoning is a single reversible toggle.
 
-### 13.2 Information architecture
+### 13.2 Interaction
 
-Single page, two regions: (1) a **profile panel** (risk tolerance selector +
-sector multi-select + "Get recommendations" primary action) and (2) a
-**results area** of recommendation cards. A persistent header carries the product
-name and the "not financial advice" disclaimer. Empty, loading, and error states
-are first-class.
+- Every user action provides visible feedback within 100 ms (submitting disables
+  the button and shows a loading state).
+- Full keyboard operability: logical tab order, visible focus, Enter submits the
+  profile, Escape collapses an expanded card; the light/dark mode toggle is
+  keyboard-operable and exposes its state (`aria-pressed`).
+- No destructive or irreversible actions; nothing requires a confirmation dialog.
 
-### 13.3 Wireframes
+### 13.3 Accessibility
 
-Per §10 (requirements here, **design** in the plan), the actual wireframes/mockups
-live in `plan.md §2.6` — rendered artifacts for **both** the light and dark themes,
-scanned clean by the bound UX/design skill's design-quality check and approved by
-the Human User. The requirement this section imposes: the §13.2 information
-architecture MUST be realized with first-class **empty** ("set a profile and get
-recommendations"), **loading** (skeleton cards), and **error**
-(grounded-watchlist-unavailable) states.
-
-### 13.4 Content design
-
-Concise, plain-language labels; confidence shown as a labeled meter (e.g.,
-"Confidence: 0.72") not just color; the disclaimer is always visible; errors are
-actionable and non-alarming.
-
-### 13.5 Interaction and accessibility (testable)
-
-- Every user action provides visible feedback within 100 ms (button disabled +
-  loading state on submit).
-- Full keyboard operability: tab order, focus-visible, Enter submits, Escape
-  collapses an expanded card.
 - WCAG 2.2 AA: contrast ≥ 4.5:1 (text) / 3:1 (UI + large text); all controls have
-  accessible names/roles; the confidence meter exposes its value to assistive tech.
-  **Both the light and dark themes** independently meet this bar.
+  accessible names/roles; the confidence meter exposes its value to assistive tech
+  (not color-only).
+- The UI ships a **light and a dark theme** with a toggle defaulting to the OS
+  preference; **each theme independently meets this bar**.
 - Responsive from 360 px to desktop; no horizontal scroll at mobile widths.
+- Automated accessibility runs in CI (see §13.4).
 
-### 13.6 Testing (required per §10 UX quality bar)
+### 13.4 Testing
 
 - **Automated accessibility:** an **axe-core** (or equivalent) check runs in CI
   against the rendered page and MUST report **zero critical/serious** violations
   — a CI gate, not an assertion (AC-11).
-- **Heuristic review:** the **Nielsen 10 usability heuristics** are reviewed as an
-  acceptance checklist and the completed checklist is recorded (in `reports/ux/`
-  and referenced from the EXECUTE-EXIT evidence) before EXECUTE-EXIT.
 - **Design-quality scan:** the bound UX/design skill's **anti-pattern scan** MUST
   report **zero findings** on every primary-screen mockup, **for both the light and
   dark themes**, before `PLAN-EXIT` — a PLAN-time gate per §10 (findings are fixed,
   not waived), recorded in `plan.md §2.6` (AC-11).
 - **Rendered-UI test:** at least one end-to-end UI test (headless browser) loads
-  the page, submits a profile, and asserts the watchlist cards + disclaimer
-  render and the empty/error states appear — so "the UI works" is verified, not
-  claimed.
+  the page, submits a profile, and asserts the watchlist cards + disclaimer render
+  and the empty/error states appear — so "the UI works" is verified, not claimed.
+- **Heuristic review:** the **Nielsen 10 usability heuristics** are reviewed as an
+  acceptance checklist and the completed checklist is recorded (in `reports/ux/`
+  and referenced from the EXECUTE-EXIT evidence) before EXECUTE-EXIT.
 
-### 13.7 Delegated-mode disclosures
+### 13.5 Delegated-mode disclosures
 
 | ID | UX choice | Rationale |
 |----|-----------|-----------|

@@ -189,7 +189,7 @@ and a stubbed model; the evaluation harness scores DIM-1..4 over `cases.jsonl`
 and writes `reports/eval/`; safety tests cover disclaimer-drop / invent-ticker /
 personalized-advice. **UI tests:** an axe-core accessibility check and a
 rendered-UI (headless-browser) test run in CI over **both the light and dark
-themes** (spec §13.6). DIM-4 (LLM-judge) runs N=20 at gate time.
+themes** (spec §13.4). DIM-4 (LLM-judge) runs N=20 at gate time.
 
 ```mermaid
 flowchart TB
@@ -404,13 +404,19 @@ selector + sector multi-select + "Get recommendations" primary action) and a
 mover. A persistent masthead carries the product name and the always-visible
 "Not financial advice" notice. Empty, loading, and error states are first-class.
 
+**Content design.** Concise, plain-language labels; confidence shown as a labeled
+meter **plus** its numeric value (e.g. `0.72`), never color alone; the "Not
+financial advice" notice is always visible; error copy states what went wrong and
+what to do next, in a calm, non-alarming voice. Terminology is consistent
+("watchlist", "movers", "confidence") across the UI.
+
 **Wireframe artifact + evidence.** The rendered mockup lives at
 `plan/wireframes/dashboard.html` (a real HTML/CSS artifact, both themes behind
 the token set and the toggle).
 
 - **Design-quality scan:** the bound UX/design skill's anti-pattern scan reports
   **0 findings** on the mockup — verified in **both** the light and the dark theme
-  (AC-11; spec §13.6).
+  (AC-11; spec §13.4).
 - **Rendered evidence:** the mockup was rendered in a browser and screenshotted in
   **both** modes, and approved by the Human User before being locked here (per
   sdlc §10 "Design evidence"). Light = FT-salmon broadsheet; dark = slate/gilt
