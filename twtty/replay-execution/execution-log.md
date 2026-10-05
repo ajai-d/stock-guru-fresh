@@ -128,3 +128,12 @@ project seed → unnumbered baseline artifacts). Specialization: `sdlc-for-agent
 - **Execution outcome:** Human-User approved the first production deploy. **W-1:** added GitHub federated credential `github-main-fresh` to the existing CI UAMI `id-stock-guru-ci` (ID-qualified subject `repo:ajai-d@106365942/stock-guru-fresh@1406297825:ref:refs/heads/main`); set repo variables `AZURE_CLIENT_ID`/`AZURE_TENANT_ID`/`AZURE_SUBSCRIPTION_ID`. **W-8:** pipeline run (dispatch, force_provision) **all green — changes/test/ui/provision/deploy**. Reuse-first `app.bicep` created the new `stock-guru-fresh` Container App in the existing `cae-stock-guru` env (shared ACR/AOAI/UAMI; no re-provisioning). **App is LIVE and verified end-to-end:** `/healthz` → `{"status":"ok"}`; `/api/recommend` → 200 with a grounded 5-ticker watchlist from `gpt-4.1-mini` (NVDA/AMD/ORCL/XOM/CVX + rationale + confidence + disclaimer); broadsheet UI renders live.
 - **Artifact / path changed:** Azure `rg-stock-guru` (new Container App `stock-guru-fresh`); GitHub repo variables + federated credential.
 - **Notes:** Live URL `https://stock-guru-fresh.thankfulgrass-c495f526.eastus2.azurecontainerapps.io`. The CI `ui` job (axe-core + rendered-UI, both themes) passed on the hosted runner — the UX enforcement gate works end-to-end. Baseline buildout EXECUTE complete.
+
+## 015
+- **Stage / task:** `execute/3i` (post-deploy fix)
+- **Approval gate:** —
+- **Timestamp (UTC):** 2026-10-05T21:40:00Z
+- **Approval outcome:** Approved
+- **Execution outcome:** Human User reported "no stocks back". Diagnosed: the API, submit handler, and rendering all work (verified in-page: `/api/recommend` → 200 grounded watchlist; `requestSubmit`/forced click render 5 entries). Root cause was **scale-to-zero cold start** — `minReplicas: 0` + 300s cooldown meant the app deactivated after idle, so the next click hit a 20–40s cold start (Agent Framework import + first model call) and looked like a hang. Fix: `minReplicas: 1` (keep one replica warm) applied live via `az containerapp update` and in `infra/app.bicep` so it persists across deploys. Verified warm: `/healthz` ok, `/api/recommend` 200 in ~2–6s with 5 grounded tickers.
+- **Artifact / path changed:** `infra/app.bicep`; Azure `stock-guru-fresh` scale config.
+- **Notes:** The Playwright "normal click times out" symptom during diagnosis was a hidden-tab artifact (rAF paused when the browser tab is not visible), not an app bug — forced click and real users are unaffected. Tradeoff: one always-on replica has a small standing cost vs. scale-to-zero.
