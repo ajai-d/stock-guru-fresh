@@ -80,7 +80,7 @@ project seed → unnumbered baseline artifacts). Specialization: `sdlc-for-agent
 - **Approval gate:** —
 - **Timestamp (UTC):** 2026-10-05T20:30:00Z
 - **Approval outcome:** Approved
-- **Execution outcome:** Baseline `plan.md` authored (Iteration ID: baseline) — architecture §1.1–§1.7, design §2.1–§2.7, orchestration §3. Reuse-first infra (new `stock-guru-fresh` Container App into the live `rg-stock-guru` env; no re-provisioning). Corrected agentic stack: current Agent Framework API (`OpenAIChatCompletionClient` + `Agent`, Chat Completions), `gpt-4.1-mini`. **§2.6 UX design locked:** Impeccable-produced broadsheet with light+dark token set + accessible mode toggle; `detect` = 0 anti-patterns in **both** themes; rendered + screenshotted in both modes and Human-User-approved.
+- **Execution outcome:** Baseline `plan.md` authored (Iteration ID: baseline) — architecture §1.1–§1.7, design §2.1–§2.7, orchestration §3. Reuse-first infra (new `stock-guru-fresh` Container App into the live `rg-stock-guru` env; no re-provisioning). Corrected agentic stack: current Agent Framework API (`OpenAIChatCompletionClient` + `Agent`, Chat Completions), `gpt-4.1-mini`. **§2.6 UX design locked:** broadsheet design produced via the bound UX/design skill (named in runtimeconfig / entry 008) with light+dark token set + accessible mode toggle; design-quality scan = 0 findings in **both** themes; rendered + screenshotted in both modes and Human-User-approved.
 - **Artifact / path changed:** `twtty/plan/plan.md`, `twtty/plan/wireframes/dashboard.html`
 - **Notes:** Conforms to the just-firmed-up §10 (genuine skill use, anti-pattern scan, rendered evidence, per-theme) — methodology commit `284db60`.
 

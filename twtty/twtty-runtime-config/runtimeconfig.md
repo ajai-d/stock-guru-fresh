@@ -32,4 +32,11 @@ Selected during the run; no fixed default.
 ```yaml
 risk-level: level-2    # assessed/selected at SEED (meta/risk-level); floor L1.
                        # The risk-calibration ladder file itself is inherited.
+reusable-assets:
+  ux-design-skill: impeccable@4.1.0   # the bound UX/design skill. Trust-boundary install,
+                                       # Human-User-consented, provenance pbakaus/impeccable
+                                       # (recorded in meta/skill-install). The skill pointer
+                                       # itself is the inherited methodology reusable-asset;
+                                       # this pins the version actually used. spec/plan reference
+                                       # it only by role ("the bound UX/design skill").
 ```

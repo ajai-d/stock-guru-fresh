@@ -37,9 +37,9 @@ schema validity, disclaimer, cost bounding) with an automated evaluation.
   (DIM-4).
 - Cost: per-recommendation model cost is logged and stays within the §11 budget.
 - Deployed and reachable: post-deploy `/healthz` returns 200 at the public URL.
-- UX: zero axe-core critical/serious violations; zero Impeccable `detect` findings
-  on every mockup (light + dark); Nielsen 10-heuristic review passes before
-  EXECUTE-EXIT (§13.6).
+- UX: zero axe-core critical/serious violations; zero design-quality-scan findings
+  (the bound UX/design skill) on every mockup (light + dark); Nielsen 10-heuristic
+  review passes before EXECUTE-EXIT (§13.6).
 
 ## 4. Constraints
 
@@ -178,10 +178,11 @@ flowchart LR
 - **AC-10** The app is deployed to Azure Container Apps via CI/CD over OIDC (no
   stored secrets); post-deploy `/healthz` returns 200 at the public URL.
 - **AC-11** The UI passes automated accessibility checks (axe-core: zero
-  critical/serious violations) run in CI, the **Impeccable `detect` anti-pattern
-  scan reports zero findings on every primary-screen mockup for both the light and
-  dark themes** (recorded in `plan.md §2.6`), and the Nielsen 10-heuristic review
-  checklist is completed and recorded before EXECUTE-EXIT (§13.6).
+  critical/serious violations) run in CI, the **bound UX/design skill's
+  design-quality / anti-pattern scan reports zero findings on every primary-screen
+  mockup for both the light and dark themes** (recorded in `plan.md §2.6`), and the
+  Nielsen 10-heuristic review checklist is completed and recorded before
+  EXECUTE-EXIT (§13.6).
 
 ## 9. Tool schemas
 
@@ -313,13 +314,14 @@ flowchart LR
 ### 13.1 Design system
 
 A **distinctive, professional, accessible** visual design — deliberately **not**
-a generic AI-default theme — produced through the bound **Impeccable** skill
-(reusable-assets) following its full authored process. The design MUST support a
-**light and a dark theme**, each meeting WCAG 2.2 AA contrast, selectable via an
-in-product **mode toggle** that defaults to the OS preference. Design tokens
-(color, type, spacing, motion), the chosen type/palette/density, and the rendered
-wireframes are **produced and recorded in `plan.md §2.6`** — rendered, visually
-captured, and Human-User-approved, not asserted.
+a generic AI-default theme — produced through **the bound UX/design skill**
+(`reusable-assets`; named with its pinned version in `runtimeconfig.md`) following
+its full authored process. The design MUST support a **light and a dark theme**,
+each meeting WCAG 2.2 AA contrast, selectable via an in-product **mode toggle**
+that defaults to the OS preference. Design tokens (color, type, spacing, motion),
+the chosen type/palette/density, and the rendered wireframes are **produced and
+recorded in `plan.md §2.6`** — rendered, visually captured, and
+Human-User-approved, not asserted.
 
 ### 13.2 Information architecture
 
@@ -333,10 +335,11 @@ are first-class.
 
 Per §10 (requirements here, **design** in the plan), the actual wireframes/mockups
 live in `plan.md §2.6` — rendered artifacts for **both** the light and dark themes,
-scanned clean by Impeccable and approved by the Human User. The requirement this
-section imposes: the §13.2 information architecture MUST be realized with first-class
-**empty** ("set a profile and get recommendations"), **loading** (skeleton cards),
-and **error** (grounded-watchlist-unavailable) states.
+scanned clean by the bound UX/design skill's design-quality check and approved by
+the Human User. The requirement this section imposes: the §13.2 information
+architecture MUST be realized with first-class **empty** ("set a profile and get
+recommendations"), **loading** (skeleton cards), and **error**
+(grounded-watchlist-unavailable) states.
 
 ### 13.4 Content design
 
@@ -363,7 +366,7 @@ actionable and non-alarming.
 - **Heuristic review:** the **Nielsen 10 usability heuristics** are reviewed as an
   acceptance checklist and the completed checklist is recorded (in `reports/ux/`
   and referenced from the EXECUTE-EXIT evidence) before EXECUTE-EXIT.
-- **Design-quality scan:** the bound **Impeccable** `detect` anti-pattern scan MUST
+- **Design-quality scan:** the bound UX/design skill's **anti-pattern scan** MUST
   report **zero findings** on every primary-screen mockup, **for both the light and
   dark themes**, before `PLAN-EXIT` — a PLAN-time gate per §10 (findings are fixed,
   not waived), recorded in `plan.md §2.6` (AC-11).
@@ -377,11 +380,11 @@ actionable and non-alarming.
 | ID | UX choice | Rationale |
 |----|-----------|-----------|
 | UXD-1 | Single-page dashboard (no routing) | One task (set profile → see recs); minimal navigation is clearer and more accessible |
-| UXD-2 | Distinctive editorial "broadsheet" design (serif masthead, press palette), **light + dark themes** via Impeccable — not a generic AI-default light theme | Avoids the "AI-tell" look; a credible home for a daily financial tip-sheet; both themes AA-accessible |
+| UXD-2 | Distinctive editorial "broadsheet" design (serif masthead, press palette), **light + dark themes** via the bound UX/design skill — not a generic AI-default light theme | Avoids the "AI-tell" look; a credible home for a daily financial tip-sheet; both themes AA-accessible |
 | UXD-3 | Confidence as labeled meter + number | Accessibility (not color-only); honest uncertainty |
 | UXD-4 | Persistent disclaimer in header | Safety (SP) — always visible regardless of scroll |
 | UXD-5 | Expandable cards for reasoning | Progressive disclosure keeps the list scannable |
-| UXD-6 | axe-core in CI + Impeccable detect (per theme) + rendered-UI test + Nielsen checklist | "UI works/accessible/non-generic" must be verified mechanically, not asserted |
+| UXD-6 | axe-core in CI + design-quality scan (bound UX skill, per theme) + rendered-UI test + Nielsen checklist | "UI works/accessible/non-generic" must be verified mechanically, not asserted |
 | UXD-7 | Light/dark mode toggle, defaulting to OS preference | User control + honors system setting; each theme independently passes the quality bar |
 
 ## 14. Data classification

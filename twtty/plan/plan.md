@@ -10,8 +10,9 @@ model — nothing prior to extend.
 - **Risk level:** 2 + Azure cloud Runtime target
 - **Plan confirmed date:** 2026-10-05
 - **Execution pattern:** Sequential (recorded in `meta/execution-pattern`)
-- **Bound UX skill:** Impeccable `impeccable@4.1.0` (reusable-assets; trust-boundary
-  install approved by the Human User — provenance `pbakaus/impeccable`).
+- **Bound UX skill:** the bound UX/design skill (`reusable-assets`), named with its
+  pinned version in `runtimeconfig.md`; a trust-boundary install consented by the
+  Human User and recorded in the replay log (`meta/skill-install`).
 
 ## 1. Architecture
 
@@ -149,8 +150,8 @@ sequenceDiagram
   (`2025-04-14`); orchestration = single-agent; tool/MCP = minimal MCP server
   exposing T-1; eval/guardrail = custom harness (deterministic scorers + one
   LLM-as-judge) with grounding/schema enforcement applied post-response; skills =
-  Impeccable (UI). The model is reached via the app **managed identity** (no
-  keys), per `config/cloud/azure.md`.
+  the bound UX/design skill (UI; per `runtimeconfig.md`). The model is reached via
+  the app **managed identity** (no keys), per `config/cloud/azure.md`.
 - **Dependencies:** lean `agent-framework-core` + `agent-framework-openai` with
   relaxed pins (avoids the `agent-framework[all]` resolution conflict).
 - **Human User's preferred agentic framework(s):** Microsoft Agent Framework on
@@ -169,7 +170,7 @@ flowchart TB
     subgraph tooling["Eval + quality"]
         pytest[pytest]:::t
         judge[LLM-as-judge harness]:::t
-        imp[Impeccable UX skill]:::t
+        imp[Bound UX/design skill]:::t
     end
     subgraph cloud["Azure AI Foundry + Azure"]
         aca[Container Apps]:::t
@@ -371,18 +372,20 @@ flowchart TB
 
 ### 2.6 UX design
 
-Realizes: spec §13 (UX mode Delegated). Produced through the bound **Impeccable**
-skill's full authored process (`init` → `concept-seed --scope direction --mode
-operate` → build → `detect` → fix), **not** asserted.
+Realizes: spec §13 (UX mode Delegated). Produced through **the bound UX/design
+skill's** full authored process (direction/concept → build → design-quality scan →
+fix), **not** asserted. The concrete skill and version are named in
+`runtimeconfig.md` and the replay-log `meta/skill-install` record.
 
 **Visual world — "Daily Market Broadsheet."** A deliberately distinctive editorial
 design (the cultural home of a daily financial tip-sheet), chosen to avoid the
-generic "AI-default" look. Impeccable lends only type, palette, density, and one
+generic "AI-default" look. The skill lends only type, palette, density, and one
 signature move; navigation and controls stay standard web.
 
 - **Type:** serif masthead/numerals (Iowan Old Style / Palatino / Georgia stack);
   grotesk for labels (`"Helvetica Neue", Arial, system-ui` — deliberately **not**
-  Inter/Roboto, which `detect` flags as overused); monospace for figures.
+  Inter/Roboto, which the design-quality scan flags as overused); monospace for
+  figures.
 - **Signature move:** pip-confidence meter (●●●●○) paired with the numeric value —
   honest uncertainty, not color-only.
 - **Two themes, one token set:** `:root`/`[data-theme="light"]` = FT-salmon
@@ -405,8 +408,9 @@ mover. A persistent masthead carries the product name and the always-visible
 `plan/wireframes/dashboard.html` (a real HTML/CSS artifact, both themes behind
 the token set and the toggle).
 
-- **Design-quality scan:** Impeccable `detect` reports **0 anti-patterns** on the
-  mockup — verified in **both** the light and the dark theme (AC-11; spec §13.6).
+- **Design-quality scan:** the bound UX/design skill's anti-pattern scan reports
+  **0 findings** on the mockup — verified in **both** the light and the dark theme
+  (AC-11; spec §13.6).
 - **Rendered evidence:** the mockup was rendered in a browser and screenshotted in
   **both** modes, and approved by the Human User before being locked here (per
   sdlc §10 "Design evidence"). Light = FT-salmon broadsheet; dark = slate/gilt
@@ -474,8 +478,8 @@ sequenceDiagram
 - **W-6-api** — FastAPI `/healthz`, `/api/movers`, `/api/recommend`; tests.
 - **W-7-ui** — SPA dashboard built from the locked §2.6 wireframe (broadsheet,
   light/dark token set + mode toggle), served by the backend; axe-core +
-  rendered-UI tests over both themes; `detect` clean re-verified on the shipped
-  markup.
+  rendered-UI tests over both themes; the bound UX/design skill's design-quality
+  scan re-verified clean on the shipped markup.
 - **W-8-cicd** — GitHub Actions: test + eval + UI tests → OIDC login → build/push
   image → deploy to the existing Container Apps env → smoke `/healthz`. Provision
   step gated on `infra/**` changes only.
@@ -510,8 +514,8 @@ graph LR
 - §1.5 records the agentic technology proposal (current Agent Framework API,
   `gpt-4.1-mini`) + Human User's preferred framework. ✅
 - §2 design present; §2.6 UX + §2.7 API present (modes ≠ N/A). **§2.6 records the
-  renderable Impeccable artifact, a clean `detect` scan for both themes, and the
-  Human-User-approved rendered evidence (PLAN-EXIT rule 16).** ✅
+  renderable artifact (bound UX/design skill), a clean design-quality scan for both
+  themes, and the Human-User-approved rendered evidence (PLAN-EXIT rule 16).** ✅
 - **Diagrams (checklist item 19):** `mermaid` fenced block present in §1.1, §1.3,
   §1.4, §1.5, §1.6, §2.1 (a `sequenceDiagram` for each of UC-1/UC-2/UC-3), §2.2,
   §2.3, §2.4, §2.5, §2.6 (UX flow + `stateDiagram-v2`), §2.7, and §3.2 (DAG). ✅
