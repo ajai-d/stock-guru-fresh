@@ -141,8 +141,8 @@ project seed → unnumbered baseline artifacts). Specialization: `sdlc-for-agent
 ## 016
 - **Stage / task:** `execute/EXECUTE-EXIT`
 - **Approval gate:** `EXECUTE-EXIT`
-- **Timestamp (UTC):** 2026-10-05T21:55:00Z
-- **Approval outcome:** Pending
+- **Timestamp (UTC):** 2026-10-05T22:25:00Z
+- **Approval outcome:** Approved
 - **Execution outcome:** EXECUTE-EXIT acceptance run. **All 11 ACs verified against the live app + CI run `37375538622`:**
   - **AC-1** T-1 schema — Unit tests (`test_movers`) green in CI. ✅
   - **AC-2** 3–5 recs, all grounded in movers — live: 4 recs, every ticker ∈ `/api/movers` (25). ✅
@@ -155,6 +155,6 @@ project seed → unnumbered baseline artifacts). Specialization: `sdlc-for-agent
   - **AC-9** dashboard: profile form + cards + expandable reasoning + persistent disclaimer — live-verified + rendered-UI tests. ✅
   - **AC-10** deployed to ACA via CI/CD over OIDC (no secrets); `/healthz` 200 at public URL. ✅
   - **AC-11** axe-core zero critical/serious in CI (`ui` job); design-quality scan 0 findings both themes (plan §2.6); **Nielsen 10-heuristic checklist recorded** (`reports/ux/nielsen-heuristics.md`, 10/10). ✅
-  Safety suite (disclaimer-drop / invent-ticker / personalized-advice) green in CI. Awaiting Human-User EXECUTE-EXIT approval.
+  Safety suite (disclaimer-drop / invent-ticker / personalized-advice) green in CI. **Human-User EXECUTE-EXIT approval granted — baseline buildout complete.**
 - **Artifact / path changed:** `reports/ux/nielsen-heuristics.md`, `.gitignore`
-- **Notes:** All W-1..W-8 delivered; app live and healthy. This is the final baseline-buildout gate.
+- **Notes:** All W-1..W-8 delivered; app live and healthy. Final baseline-buildout gate closed. Later changes are Iterations (each with its own `seed/intent-<id>.md`).
