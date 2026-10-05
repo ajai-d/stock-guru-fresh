@@ -119,3 +119,12 @@ project seed → unnumbered baseline artifacts). Specialization: `sdlc-for-agent
 - **Execution outcome:** Reuse-first infra authored: `infra/app.bicep` creates **only** the new `stock-guru-fresh` Container App, referencing the existing `cae-stock-guru` env, ACR, Azure OpenAI (`gpt-4.1-mini`) and the app UAMI (which already holds OpenAI User + AcrPull) — no shared re-provisioning, no new role assignments. Bicep compiles clean (0 diagnostics). The original shared-infra bicep (`main.bicep`/`identity.bicep`) removed from this repo (owned by the original project). `deploy.yml`: APP → `stock-guru-fresh`, added the **`ui` job** (deploy gated on it), provision now deploys `app.bicep`.
 - **Artifact / path changed:** `infra/app.bicep`, `.github/workflows/deploy.yml`
 - **Notes:** Remaining before live: **W-1 identity bootstrap is a Human-User gate** (az login to add a federated credential for `ajai-d/stock-guru-fresh` to the existing CI UAMI + set the three repo variables), and the first production deploy requires explicit Human-User approval (sdlc §9 production-promotion hard guardrail).
+
+## 014
+- **Stage / task:** `execute/3i` (W-1 identity + W-8 deploy)
+- **Approval gate:** Production promotion (first deploy)
+- **Timestamp (UTC):** 2026-10-05T21:25:00Z
+- **Approval outcome:** Approved
+- **Execution outcome:** Human-User approved the first production deploy. **W-1:** added GitHub federated credential `github-main-fresh` to the existing CI UAMI `id-stock-guru-ci` (ID-qualified subject `repo:ajai-d@106365942/stock-guru-fresh@1406297825:ref:refs/heads/main`); set repo variables `AZURE_CLIENT_ID`/`AZURE_TENANT_ID`/`AZURE_SUBSCRIPTION_ID`. **W-8:** pipeline run (dispatch, force_provision) **all green — changes/test/ui/provision/deploy**. Reuse-first `app.bicep` created the new `stock-guru-fresh` Container App in the existing `cae-stock-guru` env (shared ACR/AOAI/UAMI; no re-provisioning). **App is LIVE and verified end-to-end:** `/healthz` → `{"status":"ok"}`; `/api/recommend` → 200 with a grounded 5-ticker watchlist from `gpt-4.1-mini` (NVDA/AMD/ORCL/XOM/CVX + rationale + confidence + disclaimer); broadsheet UI renders live.
+- **Artifact / path changed:** Azure `rg-stock-guru` (new Container App `stock-guru-fresh`); GitHub repo variables + federated credential.
+- **Notes:** Live URL `https://stock-guru-fresh.thankfulgrass-c495f526.eastus2.azurecontainerapps.io`. The CI `ui` job (axe-core + rendered-UI, both themes) passed on the hosted runner — the UX enforcement gate works end-to-end. Baseline buildout EXECUTE complete.
