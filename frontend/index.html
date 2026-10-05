@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily Stock Advisor</title>
+<style>
+  :root, [data-theme="light"] {
+    --bg: #efcebb; --bg-2: #e9c6b2; --panel: #f3d8c9;
+    --ink: #241a10; --ink-soft: #543415; --ink-faint: #6a4421;
+    --rule: #d6bfae; --rule-strong: #9a8268;
+    --accent: #93291f; --accent-ink: #efcebb;
+    --notice: #93291f;
+    --up: #1c5f34; --down: #9a3025; --pip: #241a10;
+  }
+  [data-theme="dark"] {
+    --bg: #14161c; --bg-2: #1b1e27; --panel: #1b1e27;
+    --ink: #ece6da; --ink-soft: #c2b7a2; --ink-faint: #9c907b;
+    --rule: #333642; --rule-strong: #4c505d;
+    --accent: #e3ab4f; --accent-ink: #14161c;
+    --notice: #e8766a;
+    --up: #5cc085; --down: #e8766a; --pip: #e3ab4f;
+  }
+  :root {
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --grotesk: "Helvetica Neue", Arial, system-ui, sans-serif;
+    --mono: "SFMono-Regular", "Roboto Mono", "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: var(--serif); font-size: 16px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color .2s ease, color .2s ease;
+  }
+  .sheet { max-width: 1080px; margin: 0 auto; padding: 0 28px 64px; }
+
+  .masthead { padding: 26px 0 0; }
+  .eyebrow { display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--grotesk); font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--accent); border-bottom: 1px solid var(--rule); padding-bottom: 8px; }
+  .eyebrow .right { display: inline-flex; align-items: center; gap: 14px; }
+  .eyebrow .date { color: var(--ink-faint); }
+  .themebtn { font-family: var(--grotesk); font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    background: transparent; color: var(--ink-soft); border: 1px solid var(--rule-strong);
+    padding: 5px 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .themebtn:hover { color: var(--ink); border-color: var(--ink-soft); }
+  .themebtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .themebtn .ic { width: 12px; height: 12px; border-radius: 50%;
+    background: linear-gradient(90deg, var(--ink) 0 50%, transparent 50% 100%); border: 1.5px solid var(--ink); }
+
+  .title { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
+    border-bottom: 1px solid var(--rule-strong); padding: 10px 0 12px; position: relative; }
+  .title::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: var(--rule-strong); }
+  .title h1 { margin: 0; font-size: 44px; line-height: .98; letter-spacing: -.01em; font-weight: 800; }
+  .title .notice { font-family: var(--grotesk); font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--notice); border: 1.5px solid var(--notice); padding: 5px 10px; white-space: nowrap; }
+  .standfirst { font-size: 16px; color: var(--ink-soft); font-style: italic; padding: 12px 0 0; max-width: 60ch; }
+
+  .cols { display: grid; grid-template-columns: 260px 1fr; gap: 0; margin-top: 22px; border-top: 1px solid var(--rule); }
+  .rail { border-right: 1px solid var(--rule); padding: 20px 22px 20px 0; }
+  .body { padding: 20px 0 0 26px; }
+
+  .kicker { font-family: var(--grotesk); font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 12px; font-weight: 700; }
+
+  fieldset { border: 0; margin: 0 0 20px; padding: 0; }
+  legend { font-family: var(--grotesk); font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 8px; padding: 0; }
+  .risk { display: flex; border: 1px solid var(--rule-strong); }
+  .risk label { flex: 1; text-align: center; font-family: var(--grotesk); font-size: 13px; padding: 8px 10px;
+    cursor: pointer; border-right: 1px solid var(--rule); color: var(--ink-soft); position: relative; }
+  .risk label:last-child { border-right: 0; }
+  .risk label:has(input:checked) { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+  .risk label:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .sectors { display: flex; flex-direction: column; border: 1px solid var(--rule); }
+  .sectors label { display: flex; align-items: center; gap: 9px; font-size: 14px; padding: 8px 11px;
+    border-bottom: 1px solid var(--rule); cursor: pointer; font-family: var(--grotesk); color: var(--ink); }
+  .sectors label:last-child { border-bottom: 0; }
+  .sectors label:has(input:checked) { background: var(--bg-2); font-weight: 600; }
+  .sectors label:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: -3px; }
+  .tick { width: 14px; height: 14px; border: 1.5px solid var(--ink-faint); display: inline-grid; place-items: center;
+    font-size: 10px; color: var(--accent-ink); background: transparent; flex: none; }
+  .tick::after { content: "\2713"; opacity: 0; }
+  .sectors label:has(input:checked) .tick { background: var(--accent); border-color: var(--accent); }
+  .sectors label:has(input:checked) .tick::after { opacity: 1; }
+  .vh { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  .run { width: 100%; margin-top: 2px; font-family: var(--grotesk); font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; font-size: 13px; color: var(--accent-ink); background: var(--accent);
+    border: 0; padding: 12px; cursor: pointer; }
+  .run:disabled { opacity: .55; cursor: default; }
+  .run:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .rail .meta { font-family: var(--grotesk); font-size: 12px; color: var(--ink-faint); margin-top: 14px; line-height: 1.5; }
+
+  .body > .head { display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 2px solid var(--rule-strong); padding-bottom: 8px; margin-bottom: 4px; }
+  .body > .head h2 { margin: 0; font-size: 20px; }
+  .body > .head .asof { font-family: var(--grotesk); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+
+  .entry { border-bottom: 1px solid var(--rule); padding: 16px 0; }
+  .entry:last-child { border-bottom: 0; }
+  .entry .line { display: flex; align-items: baseline; gap: 12px; }
+  .entry .tkr { font-size: 25px; font-weight: 800; letter-spacing: -.01em; min-width: 92px; }
+  .entry .co { font-size: 14px; color: var(--ink-soft); flex: 1; }
+  .entry .co .sec { font-family: var(--grotesk); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); display: block; }
+  .entry .chg { font-family: var(--mono); font-size: 15px; font-weight: 700; }
+  .entry .chg.up { color: var(--up); }
+  .entry .chg.down { color: var(--down); }
+  .entry .say { margin: 9px 0 0; font-size: 16.5px; max-width: 64ch; }
+
+  .cal { display: flex; align-items: center; gap: 14px; margin-top: 11px; }
+  .cal .pips { display: inline-flex; gap: 4px; }
+  .cal .pip { width: 11px; height: 11px; border: 1.5px solid var(--pip); border-radius: 50%; }
+  .cal .pip.f { background: var(--pip); }
+  .cal .lab { font-family: var(--grotesk); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+  .cal .val { font-family: var(--mono); font-weight: 700; }
+  .cal .expand { margin-left: auto; font-family: var(--grotesk); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    background: none; border: 1px solid var(--rule-strong); padding: 5px 10px; cursor: pointer; color: var(--ink); }
+  .cal .expand:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .note { margin-top: 11px; padding: 12px 15px; border: 1px solid var(--rule); background: var(--bg-2);
+    font-size: 15px; color: var(--ink); }
+  .note[hidden] { display: none; }
+  .note .src { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); margin-top: 7px; display: block; }
+
+  .state { padding: 26px 0; color: var(--ink-soft); font-style: italic; }
+  .state.error { color: var(--down); font-style: normal; }
+  .skeleton { height: 64px; border-bottom: 1px solid var(--rule);
+    background: linear-gradient(90deg, var(--bg) 0%, var(--bg-2) 50%, var(--bg) 100%);
+    background-size: 200% 100%; animation: sh 1.2s infinite; }
+
+  .colophon { border-top: 1px solid var(--rule); margin-top: 26px; padding-top: 12px;
+    font-family: var(--grotesk); font-size: 12px; letter-spacing: .04em; color: var(--ink-faint); text-align: center; }
+
+  @keyframes sh { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  @media (max-width: 760px) {
+    .title h1 { font-size: 32px; }
+    .cols { grid-template-columns: 1fr; }
+    .rail { border-right: 0; border-bottom: 1px solid var(--rule); padding: 0 0 18px; }
+    .body { padding: 18px 0 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { body { transition: none; } .skeleton { animation: none; } }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <header class="masthead">
+      <div class="eyebrow">
+        <span>Grounded in today's movers</span>
+        <span class="right">
+          <button class="themebtn" id="themebtn" type="button" aria-pressed="false">
+            <span class="ic" aria-hidden="true"></span><span class="tlabel">Dark</span> mode
+          </button>
+          <span class="date" id="today"></span>
+        </span>
+      </div>
+      <div class="title">
+        <h1>Daily Stock Advisor</h1>
+        <span class="notice" role="note">Not financial advice</span>
+      </div>
+      <p class="standfirst">Three to five ideas drawn strictly from today's market movers — each one explained, each with an honest confidence. A starting point, nothing more.</p>
+    </header>
+
+    <div class="cols">
+      <form class="rail" id="profile-form" aria-label="Your profile">
+        <p class="kicker">Set your profile</p>
+        <fieldset>
+          <legend>Risk tolerance</legend>
+          <div class="risk" role="radiogroup" aria-label="Risk tolerance">
+            <label><input class="vh" type="radio" name="risk" value="low" /> Low</label>
+            <label><input class="vh" type="radio" name="risk" value="medium" checked /> Medium</label>
+            <label><input class="vh" type="radio" name="risk" value="high" /> High</label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Sectors of interest</legend>
+          <div class="sectors" id="sectors"></div>
+        </fieldset>
+        <button class="run" type="submit" id="go">Get recommendations</button>
+        <p class="meta">No account. No data stored. The in-session profile shapes which movers are emphasized.</p>
+      </form>
+
+      <section class="body" aria-label="Recommended watchlist">
+        <div class="head">
+          <h2>Today's watchlist</h2>
+          <span class="asof" id="asof"></span>
+        </div>
+        <div id="results" aria-live="polite">
+          <p class="state">Set a profile and get your daily watchlist.</p>
+        </div>
+      </section>
+    </div>
+
+    <p class="colophon">Ideas are generated from public market movers and are explicitly not financial advice.</p>
+  </div>
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var btn = document.getElementById('themebtn');
+      var label = btn.querySelector('.tlabel');
+      function applyTheme(theme) {
+        root.setAttribute('data-theme', theme);
+        var isDark = theme === 'dark';
+        btn.setAttribute('aria-pressed', String(isDark));
+        label.textContent = isDark ? 'Light' : 'Dark';
+      }
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyTheme(prefersDark ? 'dark' : 'light');
+      btn.addEventListener('click', function () {
+        applyTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+    })();
+
+    document.getElementById('today').textContent =
+      new Date().toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    var SECTORS = ["Technology", "Financials", "Energy", "Healthcare",
+      "Consumer Discretionary", "Consumer Staples", "Communication Services", "Industrials"];
+    var sx = document.getElementById('sectors');
+    SECTORS.forEach(function (s, i) {
+      var l = document.createElement('label');
+      l.innerHTML = '<input class="vh" type="checkbox" value="' + s + '"' + (i === 0 ? ' checked' : '') +
+        ' /><span class="tick" aria-hidden="true"></span>' + s;
+      sx.appendChild(l);
+    });
+
+    var results = document.getElementById('results');
+    var asof = document.getElementById('asof');
+
+    function esc(s) {
+      return String(s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function pips(conf) {
+      var filled = Math.round(conf * 5), out = '';
+      for (var i = 0; i < 5; i++) out += '<span class="pip' + (i < filled ? ' f' : '') + '"></span>';
+      return '<span class="pips" role="img" aria-label="Confidence ' + conf.toFixed(2) + ' of 1">' + out + '</span>';
+    }
+    function entry(rec, idx) {
+      var nid = 'note-' + idx;
+      return '<article class="entry">' +
+        '<div class="line"><span class="tkr">' + esc(rec.ticker) + '</span>' +
+        '<span class="co">Grounded in today\'s movers</span></div>' +
+        '<p class="say">' + esc(rec.rationale) + '</p>' +
+        '<div class="cal"><span class="lab">Confidence</span>' + pips(rec.confidence) +
+        '<span class="val">' + rec.confidence.toFixed(2) + '</span>' +
+        '<button class="expand" type="button" aria-expanded="false" aria-controls="' + nid + '">Show reasoning</button></div>' +
+        '<div class="note" id="' + nid + '" hidden>' + esc(rec.rationale) +
+        '<span class="src">Grounded strictly in today\'s market movers.</span></div>' +
+        '</article>';
+    }
+
+    function wireExpanders() {
+      results.querySelectorAll('.expand').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var note = document.getElementById(b.getAttribute('aria-controls'));
+          var open = b.getAttribute('aria-expanded') === 'true';
+          b.setAttribute('aria-expanded', String(!open));
+          b.textContent = open ? 'Show reasoning' : 'Hide reasoning';
+          note.hidden = open;
+        });
+      });
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      results.querySelectorAll('.expand[aria-expanded="true"]').forEach(function (b) {
+        b.setAttribute('aria-expanded', 'false');
+        b.textContent = 'Show reasoning';
+        document.getElementById(b.getAttribute('aria-controls')).hidden = true;
+      });
+    });
+
+    document.getElementById('profile-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var risk = document.querySelector('input[name="risk"]:checked').value;
+      var sectors = [].slice.call(document.querySelectorAll('#sectors input:checked')).map(function (c) { return c.value; });
+      var go = document.getElementById('go');
+      go.disabled = true;
+      asof.textContent = '';
+      results.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
+      try {
+        var r = await fetch('/api/recommend', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ risk: risk, sectors: sectors })
+        });
+        if (!r.ok) throw new Error('status ' + r.status);
+        var data = await r.json();
+        var list = data.watchlist || [];
+        if (!list.length) {
+          results.innerHTML = '<p class="state">No grounded ideas for this profile today.</p>';
+        } else {
+          results.innerHTML = list.map(entry).join('');
+          asof.textContent = 'As of ' + new Date().toLocaleDateString() + ' \u00b7 ' + list.length + ' ideas';
+          wireExpanders();
+        }
+      } catch (err) {
+        results.innerHTML = '<p class="state error">Could not produce a grounded watchlist. Please try again.</p>';
+      } finally {
+        go.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

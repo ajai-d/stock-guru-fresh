@@ -6,3 +6,10 @@ infra/*.json
 .env
 .github/skills/
 
+node_modules/
+tests/ui/test-results/
+tests/ui/playwright-report/
+
+.github/agents/impeccable-*
+.github/hooks/impeccable.json
+

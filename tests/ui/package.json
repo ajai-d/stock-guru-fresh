@@ -1,0 +1,14 @@
+{
+  "name": "stock-guru-ui-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Rendered-UI + axe-core accessibility tests for the Daily Stock Advisor dashboard (both themes).",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.0",
+    "@playwright/test": "^1.48.0",
+    "http-server": "^14.1.1"
+  }
+}

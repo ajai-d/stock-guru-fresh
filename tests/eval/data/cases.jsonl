@@ -1,0 +1,20 @@
+{"id": "c01", "risk": "low", "sectors": ["Technology"]}
+{"id": "c02", "risk": "medium", "sectors": ["Technology"]}
+{"id": "c03", "risk": "high", "sectors": ["Technology"]}
+{"id": "c04", "risk": "low", "sectors": ["Financials"]}
+{"id": "c05", "risk": "medium", "sectors": ["Financials"]}
+{"id": "c06", "risk": "high", "sectors": ["Energy"]}
+{"id": "c07", "risk": "low", "sectors": ["Healthcare"]}
+{"id": "c08", "risk": "medium", "sectors": ["Healthcare"]}
+{"id": "c09", "risk": "high", "sectors": ["Consumer Discretionary"]}
+{"id": "c10", "risk": "medium", "sectors": ["Communication Services"]}
+{"id": "c11", "risk": "low", "sectors": ["Consumer Staples"]}
+{"id": "c12", "risk": "high", "sectors": ["Industrials"]}
+{"id": "c13", "risk": "medium", "sectors": ["Technology", "Financials"]}
+{"id": "c14", "risk": "high", "sectors": ["Energy", "Industrials"]}
+{"id": "c15", "risk": "low", "sectors": ["Healthcare", "Consumer Staples"]}
+{"id": "c16", "risk": "medium", "sectors": []}
+{"id": "c17", "risk": "high", "sectors": []}
+{"id": "c18", "risk": "low", "sectors": ["Communication Services", "Technology"]}
+{"id": "c19", "risk": "medium", "sectors": ["Consumer Discretionary", "Energy"]}
+{"id": "c20", "risk": "high", "sectors": ["Financials", "Healthcare"]}

@@ -1,0 +1,140 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force_provision:
+        description: "Force infrastructure provisioning even with no infra/ changes"
+        type: boolean
+        default: false
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  RG: rg-stock-guru
+  APP: stock-guru-fresh
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test deps
+        run: pip install fastapi "uvicorn[standard]" pydantic httpx pytest
+      - name: Unit tests
+        run: pytest -q
+      - name: Evaluation (DIM-1..4)
+        run: python -m tests.eval.run --dataset tests/eval/data/cases.jsonl --out reports/eval/ci-${{ github.run_id }}.json
+      - name: Safety checks
+        run: python -m tests.safety.run
+
+  # Rendered-UI + axe-core accessibility tests over BOTH themes (spec §13.4, AC-11).
+  # Backend-independent: /api/recommend is intercepted, so this gates the shipped markup.
+  ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install UI test deps
+        working-directory: tests/ui
+        run: npm ci
+      - name: Install Playwright browser
+        working-directory: tests/ui
+        run: npx playwright install --with-deps chromium
+      - name: Rendered-UI + accessibility tests
+        working-directory: tests/ui
+        run: npx playwright test
+
+  # Does this push change the infrastructure definition? infra/** is the executable form
+  # of the spec's infrastructure architecture — a change here is an infra-architecture change.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      infra: ${{ steps.filter.outputs.infra }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            infra:
+              - 'infra/**'
+
+  # Provision only when the infra definition changed (or a manual force). Bicep is idempotent
+  # (incremental mode reconciles; it never duplicates), so this gate simply avoids
+  # re-validating/re-provisioning unchanged infrastructure on every app commit and keeps app
+  # deploys decoupled from infra-template drift.
+  provision:
+    needs: [test, changes]
+    if: ${{ needs.changes.outputs.infra == 'true' || (github.event_name == 'workflow_dispatch' && inputs.force_provision) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Azure login (OIDC — no stored secrets)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Provision app (Bicep, reuse-first)
+        uses: azure/arm-deploy@v2
+        with:
+          resourceGroupName: ${{ env.RG }}
+          template: infra/app.bicep
+          deploymentName: stock-guru-fresh-app-${{ github.run_id }}
+          failOnStdErr: false
+
+  # Build + deploy the app image on every commit. Resource names are discovered from Azure,
+  # so this runs whether or not provisioning happened this run (needs provision, but tolerates
+  # it being skipped).
+  deploy:
+    needs: [test, ui, provision]
+    if: ${{ always() && needs.test.result == 'success' && needs.ui.result == 'success' && needs.provision.result != 'failure' && needs.provision.result != 'cancelled' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC — no stored secrets)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Resolve resource names
+        id: rn
+        run: |
+          ACR=$(az acr list -g "$RG" --query "[0].name" -o tsv)
+          if [ -z "$ACR" ]; then
+            echo "No ACR found in $RG — run provisioning first (push an infra/ change or dispatch with force_provision=true)." >&2
+            exit 1
+          fi
+          ACR_LOGIN=$(az acr show -n "$ACR" --query loginServer -o tsv)
+          echo "acr=$ACR" >> "$GITHUB_OUTPUT"
+          echo "login=$ACR_LOGIN" >> "$GITHUB_OUTPUT"
+
+      - name: Build + push image in ACR
+        run: az acr build -r "${{ steps.rn.outputs.acr }}" -t "$APP:${{ github.sha }}" .
+
+      - name: Deploy image to Container App
+        run: az containerapp update -n "$APP" -g "$RG" --image "${{ steps.rn.outputs.login }}/$APP:${{ github.sha }}"
+
+      - name: Smoke test /healthz
+        run: |
+          FQDN=$(az containerapp show -n "$APP" -g "$RG" --query properties.configuration.ingress.fqdn -o tsv)
+          echo "app: https://$FQDN"
+          for i in $(seq 1 8); do
+            sleep 20
+            if curl -fsSL "https://$FQDN/healthz"; then echo " healthz ok"; break; fi
+            echo "waiting for app (attempt $i)..."
+          done
+          curl -fsSL "https://$FQDN/healthz"

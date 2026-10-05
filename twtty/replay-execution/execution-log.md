@@ -88,8 +88,8 @@ project seed → unnumbered baseline artifacts). Specialization: `sdlc-for-agent
 - **Stage / task:** `plan/2b`
 - **Approval gate:** `PLAN-EXIT`
 - **Timestamp (UTC):** 2026-10-05T20:31:00Z
-- **Approval outcome:** Pending
-- **Execution outcome:** PLAN-EXIT self-verification checklist complete (§1–§3 present; required diagrams present incl. §2.6 UX flow + stateDiagram; W-4-eval + eval-first edge; identity-bootstrap first). Awaiting Human-User PLAN-EXIT approval before EXECUTE.
+- **Approval outcome:** Approved
+- **Execution outcome:** PLAN-EXIT self-verification checklist complete (§1–§3 present; required diagrams present incl. §2.6 UX flow + stateDiagram; W-4-eval + eval-first edge; identity-bootstrap first). **Human-User PLAN-EXIT approval granted; entering EXECUTE.**
 - **Artifact / path changed:** `twtty/plan/plan.md`
 - **Notes:** EXECUTE reuses the live rg-stock-guru infra; deploys a new Container App (no second standing bill).
 
@@ -101,3 +101,21 @@ project seed → unnumbered baseline artifacts). Specialization: `sdlc-for-agent
 - **Execution outcome:** `spec.md §13` realigned to the methodology's requirement-dimension structure (Task efficiency / Interaction / Accessibility / Testing / Delegated-mode disclosures), matching `spec-template.md §13`. Added an explicit **§13.1 Task efficiency** requirement (previously only implied). Design-level content (design system, information architecture, wireframes, content voice) moved to its canonical home, `plan.md §2.6` (content-design voice/tone paragraph added there). §13.x cross-references updated (testing now §13.4).
 - **Artifact / path changed:** `twtty/spec/spec.md`, `twtty/plan/plan.md`
 - **Notes:** Editorial/structural realignment — no AC removed; the only new obligation is making task efficiency testable. Keeps the instance a faithful example of the methodology it exercises.
+
+## 012
+- **Stage / task:** `execute/3` (W-3..W-7 build)
+- **Approval gate:** —
+- **Timestamp (UTC):** 2026-10-05T21:10:00Z
+- **Approval outcome:** Approved
+- **Execution outcome:** App built on the proven original stock-guru source (reuse), adapted for the baseline: backend/agent/MCP/movers/eval/safety carried over (current Agent Framework API + `gpt-4.1-mini` already in the live base). **W-7 UI rebuilt from the locked §2.6 wireframe** — `frontend/index.html` is the broadsheet dashboard with the light/dark token set + accessible mode toggle, wired to `/api/recommend` (dynamic sectors, pip-confidence cards, empty/loading/error states, keyboard, Escape-collapses). Design-quality scan re-verified **clean (0 anti-patterns)** on the shipped markup. **New UI tests** (`tests/ui/`, Playwright + axe-core) pass locally — **6/6 green**, incl. axe clean on **both** light and dark themes and the rendered-UI flow (AC-11; spec §13.4).
+- **Artifact / path changed:** `frontend/index.html`, `tests/ui/*`, `src/**`, `tests/**`, `data/**`, `Dockerfile`, `requirements.txt`
+- **Notes:** UI tests are backend-independent (API intercepted), so they gate the shipped markup in CI.
+
+## 013
+- **Stage / task:** `execute/3` (W-2/W-8 infra + CI)
+- **Approval gate:** —
+- **Timestamp (UTC):** 2026-10-05T21:12:00Z
+- **Approval outcome:** Approved
+- **Execution outcome:** Reuse-first infra authored: `infra/app.bicep` creates **only** the new `stock-guru-fresh` Container App, referencing the existing `cae-stock-guru` env, ACR, Azure OpenAI (`gpt-4.1-mini`) and the app UAMI (which already holds OpenAI User + AcrPull) — no shared re-provisioning, no new role assignments. Bicep compiles clean (0 diagnostics). The original shared-infra bicep (`main.bicep`/`identity.bicep`) removed from this repo (owned by the original project). `deploy.yml`: APP → `stock-guru-fresh`, added the **`ui` job** (deploy gated on it), provision now deploys `app.bicep`.
+- **Artifact / path changed:** `infra/app.bicep`, `.github/workflows/deploy.yml`
+- **Notes:** Remaining before live: **W-1 identity bootstrap is a Human-User gate** (az login to add a federated credential for `ajai-d/stock-guru-fresh` to the existing CI UAMI + set the three repo variables), and the first production deploy requires explicit Human-User approval (sdlc §9 production-promotion hard guardrail).

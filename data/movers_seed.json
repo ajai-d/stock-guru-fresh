@@ -1,0 +1,30 @@
+{
+  "as_of": "2026-10-05",
+  "movers": [
+    { "ticker": "NVDA", "name": "NVIDIA Corporation", "sector": "Technology", "change_pct": 6.8, "price": 182.4 },
+    { "ticker": "AMD", "name": "Advanced Micro Devices", "sector": "Technology", "change_pct": 5.1, "price": 171.2 },
+    { "ticker": "TSLA", "name": "Tesla Inc", "sector": "Consumer Discretionary", "change_pct": 4.7, "price": 268.9 },
+    { "ticker": "AAPL", "name": "Apple Inc", "sector": "Technology", "change_pct": 2.3, "price": 241.5 },
+    { "ticker": "MSFT", "name": "Microsoft Corporation", "sector": "Technology", "change_pct": 1.9, "price": 438.1 },
+    { "ticker": "JPM", "name": "JPMorgan Chase", "sector": "Financials", "change_pct": 3.4, "price": 232.7 },
+    { "ticker": "BAC", "name": "Bank of America", "sector": "Financials", "change_pct": 2.8, "price": 46.3 },
+    { "ticker": "XOM", "name": "Exxon Mobil", "sector": "Energy", "change_pct": -3.2, "price": 112.6 },
+    { "ticker": "CVX", "name": "Chevron Corporation", "sector": "Energy", "change_pct": -2.5, "price": 158.9 },
+    { "ticker": "PFE", "name": "Pfizer Inc", "sector": "Healthcare", "change_pct": -4.1, "price": 27.8 },
+    { "ticker": "JNJ", "name": "Johnson & Johnson", "sector": "Healthcare", "change_pct": 1.2, "price": 162.4 },
+    { "ticker": "UNH", "name": "UnitedHealth Group", "sector": "Healthcare", "change_pct": -5.3, "price": 548.2 },
+    { "ticker": "WMT", "name": "Walmart Inc", "sector": "Consumer Staples", "change_pct": 2.1, "price": 98.7 },
+    { "ticker": "KO", "name": "Coca-Cola Company", "sector": "Consumer Staples", "change_pct": -1.4, "price": 68.5 },
+    { "ticker": "DIS", "name": "Walt Disney Company", "sector": "Communication Services", "change_pct": 3.9, "price": 112.3 },
+    { "ticker": "NFLX", "name": "Netflix Inc", "sector": "Communication Services", "change_pct": 4.4, "price": 742.1 },
+    { "ticker": "BA", "name": "Boeing Company", "sector": "Industrials", "change_pct": -3.8, "price": 178.5 },
+    { "ticker": "CAT", "name": "Caterpillar Inc", "sector": "Industrials", "change_pct": 2.6, "price": 398.2 },
+    { "ticker": "GE", "name": "GE Aerospace", "sector": "Industrials", "change_pct": 3.1, "price": 201.8 },
+    { "ticker": "AMZN", "name": "Amazon.com Inc", "sector": "Consumer Discretionary", "change_pct": 2.9, "price": 221.4 },
+    { "ticker": "GOOGL", "name": "Alphabet Inc", "sector": "Communication Services", "change_pct": 1.7, "price": 198.3 },
+    { "ticker": "META", "name": "Meta Platforms", "sector": "Communication Services", "change_pct": 3.6, "price": 612.9 },
+    { "ticker": "ORCL", "name": "Oracle Corporation", "sector": "Technology", "change_pct": 5.8, "price": 189.6 },
+    { "ticker": "CRM", "name": "Salesforce Inc", "sector": "Technology", "change_pct": 2.4, "price": 342.1 },
+    { "ticker": "COP", "name": "ConocoPhillips", "sector": "Energy", "change_pct": -2.9, "price": 104.7 }
+  ]
+}

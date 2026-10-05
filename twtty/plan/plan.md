@@ -375,7 +375,9 @@ flowchart TB
 Realizes: spec §13 (UX mode Delegated). Produced through **the bound UX/design
 skill's** full authored process (direction/concept → build → design-quality scan →
 fix), **not** asserted. The concrete skill and version are named in
-`runtimeconfig.md` and the replay-log `meta/skill-install` record.
+`runtimeconfig.md` and the replay-log `meta/skill-install` record. The grounding
+UX design brief (users, positioning, principles, voice, content, a11y) is at
+[`plan/ux-design.md`](ux-design.md).
 
 **Visual world — "Daily Market Broadsheet."** A deliberately distinctive editorial
 design (the cultural home of a daily financial tip-sheet), chosen to avoid the
