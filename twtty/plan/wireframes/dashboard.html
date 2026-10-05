@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily Stock Advisor</title>
+<style>
+  /* Broadsheet world, two committed palettes behind one set of tokens */
+  :root, [data-theme="light"] {
+    --bg: #efcebb; --bg-2: #e9c6b2; --panel: #f3d8c9;
+    --ink: #241a10; --ink-soft: #543415; --ink-faint: #6a4421;
+    --rule: #d6bfae; --rule-strong: #9a8268;
+    --accent: #93291f; --accent-ink: #efcebb;  /* press-red spot */
+    --notice: #93291f;
+    --up: #1c5f34; --down: #9a3025; --pip: #241a10;
+  }
+  [data-theme="dark"] {
+    --bg: #14161c; --bg-2: #1b1e27; --panel: #1b1e27;
+    --ink: #ece6da; --ink-soft: #c2b7a2; --ink-faint: #9c907b;
+    --rule: #333642; --rule-strong: #4c505d;
+    --accent: #e3ab4f; --accent-ink: #14161c;  /* gilt-gold spot */
+    --notice: #e8766a;
+    --up: #5cc085; --down: #e8766a; --pip: #e3ab4f;
+  }
+  :root {
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --grotesk: "Helvetica Neue", Arial, system-ui, sans-serif;
+    --mono: "SFMono-Regular", "Roboto Mono", "Courier New", monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: var(--serif); font-size: 16px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color .2s ease, color .2s ease;
+  }
+  .sheet { max-width: 1080px; margin: 0 auto; padding: 0 28px 64px; }
+
+  .masthead { padding: 26px 0 0; }
+  .eyebrow { display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--grotesk); font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--accent); border-bottom: 1px solid var(--rule); padding-bottom: 8px; }
+  .eyebrow .right { display: inline-flex; align-items: center; gap: 14px; }
+  .eyebrow .date { color: var(--ink-faint); }
+  .themebtn { font-family: var(--grotesk); font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    background: transparent; color: var(--ink-soft); border: 1px solid var(--rule-strong);
+    padding: 5px 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .themebtn:hover { color: var(--ink); border-color: var(--ink-soft); }
+  .themebtn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .themebtn .ic { width: 12px; height: 12px; border-radius: 50%;
+    background: linear-gradient(90deg, var(--ink) 0 50%, transparent 50% 100%); border: 1.5px solid var(--ink); }
+
+  .title { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px;
+    border-bottom: 1px solid var(--rule-strong); padding: 10px 0 12px; position: relative; }
+  .title::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 1px; background: var(--rule-strong); }
+  .title h1 { margin: 0; font-size: 44px; line-height: .98; letter-spacing: -.01em; font-weight: 800; }
+  .title .notice { font-family: var(--grotesk); font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--notice); border: 1.5px solid var(--notice); padding: 5px 10px; white-space: nowrap; }
+  .standfirst { font-size: 16px; color: var(--ink-soft); font-style: italic; padding: 12px 0 0; max-width: 60ch; }
+
+  .cols { display: grid; grid-template-columns: 260px 1fr; gap: 0; margin-top: 22px; border-top: 1px solid var(--rule); }
+  .rail { border-right: 1px solid var(--rule); padding: 20px 22px 20px 0; }
+  .body { padding: 20px 0 0 26px; }
+
+  .kicker { font-family: var(--grotesk); font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 12px; font-weight: 700; }
+
+  .field { margin-bottom: 20px; }
+  .field > .lab { font-family: var(--grotesk); font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-soft); display: block; margin-bottom: 8px; }
+  .risk { display: flex; border: 1px solid var(--rule-strong); }
+  .risk label { flex: 1; text-align: center; font-family: var(--grotesk); font-size: 13px; padding: 8px 10px;
+    cursor: pointer; border-right: 1px solid var(--rule); color: var(--ink-soft); }
+  .risk label:last-child { border-right: 0; }
+  .risk label.on { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+  .sectors { display: flex; flex-direction: column; border: 1px solid var(--rule); }
+  .sectors label { display: flex; align-items: center; gap: 9px; font-size: 14px; padding: 8px 11px;
+    border-bottom: 1px solid var(--rule); cursor: pointer; font-family: var(--grotesk); color: var(--ink); }
+  .sectors label:last-child { border-bottom: 0; }
+  .sectors label.on { background: var(--bg-2); font-weight: 600; }
+  .tick { width: 14px; height: 14px; border: 1.5px solid var(--ink-faint); display: inline-grid; place-items: center;
+    font-size: 10px; color: var(--accent-ink); background: transparent; }
+  .sectors label.on .tick { background: var(--accent); border-color: var(--accent); }
+  .run { width: 100%; margin-top: 2px; font-family: var(--grotesk); font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; font-size: 13px; color: var(--accent-ink); background: var(--accent);
+    border: 0; padding: 12px; cursor: pointer; }
+  .run:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .rail .meta { font-family: var(--grotesk); font-size: 12px; color: var(--ink-faint); margin-top: 14px; line-height: 1.5; }
+
+  .body > .head { display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 2px solid var(--rule-strong); padding-bottom: 8px; margin-bottom: 4px; }
+  .body > .head h2 { margin: 0; font-size: 20px; }
+  .body > .head .asof { font-family: var(--grotesk); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+
+  .entry { border-bottom: 1px solid var(--rule); padding: 16px 0; }
+  .entry:last-child { border-bottom: 0; }
+  .entry .line { display: flex; align-items: baseline; gap: 12px; }
+  .entry .tkr { font-size: 25px; font-weight: 800; letter-spacing: -.01em; min-width: 92px; }
+  .entry .co { font-size: 14px; color: var(--ink-soft); flex: 1; }
+  .entry .co .sec { font-family: var(--grotesk); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); display: block; }
+  .entry .chg { font-family: var(--mono); font-size: 15px; font-weight: 700; }
+  .entry .chg.up { color: var(--up); }
+  .entry .chg.down { color: var(--down); }
+  .entry .say { margin: 9px 0 0; font-size: 16.5px; max-width: 64ch; }
+
+  .cal { display: flex; align-items: center; gap: 14px; margin-top: 11px; }
+  .cal .pips { display: inline-flex; gap: 4px; }
+  .cal .pip { width: 11px; height: 11px; border: 1.5px solid var(--pip); border-radius: 50%; }
+  .cal .pip.f { background: var(--pip); }
+  .cal .lab { font-family: var(--grotesk); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+  .cal .val { font-family: var(--mono); font-weight: 700; }
+  .cal .expand { margin-left: auto; font-family: var(--grotesk); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    background: none; border: 1px solid var(--rule-strong); padding: 5px 10px; cursor: pointer; color: var(--ink); }
+  .note { margin-top: 11px; padding: 12px 15px; border: 1px solid var(--rule); background: var(--bg-2);
+    font-size: 15px; color: var(--ink); }
+  .note .src { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); margin-top: 7px; }
+
+  .colophon { border-top: 1px solid var(--rule); margin-top: 26px; padding-top: 12px;
+    font-family: var(--grotesk); font-size: 12px; letter-spacing: .04em; color: var(--ink-faint); text-align: center; }
+
+  @media (max-width: 760px) {
+    .title h1 { font-size: 32px; }
+    .cols { grid-template-columns: 1fr; }
+    .rail { border-right: 0; border-bottom: 1px solid var(--rule); padding: 0 0 18px; }
+    .body { padding: 18px 0 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { body { transition: none; } }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <header class="masthead">
+      <div class="eyebrow">
+        <span>Grounded in today's movers</span>
+        <span class="right">
+          <button class="themebtn" id="themebtn" type="button" aria-pressed="false">
+            <span class="ic" aria-hidden="true"></span><span class="tlabel">Dark</span> mode
+          </button>
+          <span class="date">Monday, 5 October 2026</span>
+        </span>
+      </div>
+      <div class="title">
+        <h1>Daily Stock Advisor</h1>
+        <span class="notice">Not financial advice</span>
+      </div>
+      <p class="standfirst">Three to five ideas drawn strictly from today's market movers — each one explained, each with an honest confidence. A starting point, nothing more.</p>
+    </header>
+
+    <div class="cols">
+      <form class="rail" aria-label="Your profile">
+        <p class="kicker">Set your profile</p>
+        <div class="field">
+          <span class="lab">Risk tolerance</span>
+          <div class="risk" role="radiogroup" aria-label="Risk tolerance">
+            <label>Low</label><label class="on">Medium</label><label>High</label>
+          </div>
+        </div>
+        <div class="field">
+          <span class="lab">Sectors of interest</span>
+          <div class="sectors">
+            <label class="on"><span class="tick">✓</span> Technology</label>
+            <label class="on"><span class="tick">✓</span> Energy</label>
+            <label><span class="tick"></span> Healthcare</label>
+            <label><span class="tick"></span> Finance</label>
+            <label><span class="tick"></span> Consumer</label>
+          </div>
+        </div>
+        <button class="run" type="button">Get recommendations</button>
+        <p class="meta">No account. No data stored. The in-session profile shapes which movers are emphasized.</p>
+      </form>
+
+      <section class="body" aria-label="Recommended watchlist">
+        <div class="head">
+          <h2>Today's watchlist</h2>
+          <span class="asof">As of 5 Oct 2026 · 4 ideas</span>
+        </div>
+
+        <article class="entry">
+          <div class="line">
+            <span class="tkr">NVDA</span>
+            <span class="co">NVIDIA Corporation <span class="sec">Technology</span></span>
+            <span class="chg up">▲ 6.8%</span>
+          </div>
+          <p class="say">Strongest technology mover on the board today; the advance is broad rather than a single-headline spike, which suits a medium-risk, tech-weighted profile.</p>
+          <div class="cal">
+            <span class="lab">Confidence</span>
+            <span class="pips" role="img" aria-label="Confidence 0.90 of 1">
+              <span class="pip f"></span><span class="pip f"></span><span class="pip f"></span><span class="pip f"></span><span class="pip f"></span>
+            </span>
+            <span class="val">0.90</span>
+            <button class="expand" type="button" aria-expanded="true">Hide reasoning</button>
+          </div>
+          <div class="note">
+            Picked because NVDA is the largest gainer within a selected sector, and the move is distributed across the session rather than concentrated in one print.
+            <div class="src">Source mover — NVDA · Technology · +6.8% · $184.20</div>
+          </div>
+        </article>
+
+        <article class="entry">
+          <div class="line">
+            <span class="tkr">ORCL</span>
+            <span class="co">Oracle Corporation <span class="sec">Technology</span></span>
+            <span class="chg up">▲ 5.8%</span>
+          </div>
+          <p class="say">A second technology gainer with a steady, sector-aligned advance — a calmer complement to the day's sharper movers.</p>
+          <div class="cal">
+            <span class="lab">Confidence</span>
+            <span class="pips" role="img" aria-label="Confidence 0.80 of 1">
+              <span class="pip f"></span><span class="pip f"></span><span class="pip f"></span><span class="pip f"></span><span class="pip"></span>
+            </span>
+            <span class="val">0.80</span>
+            <button class="expand" type="button" aria-expanded="false">Show reasoning</button>
+          </div>
+        </article>
+
+        <article class="entry">
+          <div class="line">
+            <span class="tkr">AMD</span>
+            <span class="co">Advanced Micro Devices <span class="sec">Technology</span></span>
+            <span class="chg up">▲ 5.1%</span>
+          </div>
+          <p class="say">Another technology name in the day's gainers; fits the stated sector preference at a medium risk setting.</p>
+          <div class="cal">
+            <span class="lab">Confidence</span>
+            <span class="pips" role="img" aria-label="Confidence 0.74 of 1">
+              <span class="pip f"></span><span class="pip f"></span><span class="pip f"></span><span class="pip f"></span><span class="pip"></span>
+            </span>
+            <span class="val">0.74</span>
+            <button class="expand" type="button" aria-expanded="false">Show reasoning</button>
+          </div>
+        </article>
+
+        <article class="entry">
+          <div class="line">
+            <span class="tkr">XOM</span>
+            <span class="co">Exxon Mobil <span class="sec">Energy</span></span>
+            <span class="chg down">▼ 3.2%</span>
+          </div>
+          <p class="say">Energy exposure per your profile; included despite today's pullback so the list isn't entirely one-directional.</p>
+          <div class="cal">
+            <span class="lab">Confidence</span>
+            <span class="pips" role="img" aria-label="Confidence 0.60 of 1">
+              <span class="pip f"></span><span class="pip f"></span><span class="pip f"></span><span class="pip"></span><span class="pip"></span>
+            </span>
+            <span class="val">0.60</span>
+            <button class="expand" type="button" aria-expanded="false">Show reasoning</button>
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <p class="colophon">Ideas are generated from public market movers and are explicitly not financial advice.</p>
+  </div>
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+      var btn = document.getElementById('themebtn');
+      var label = btn.querySelector('.tlabel');
+      function apply(theme) {
+        root.setAttribute('data-theme', theme);
+        var isDark = theme === 'dark';
+        btn.setAttribute('aria-pressed', String(isDark));
+        label.textContent = isDark ? 'Light' : 'Dark';
+      }
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      apply(prefersDark ? 'dark' : 'light');
+      btn.addEventListener('click', function () {
+        apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+      });
+    })();
+  </script>
+</body>
+</html>
