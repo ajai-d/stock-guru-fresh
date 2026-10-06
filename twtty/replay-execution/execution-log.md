@@ -158,3 +158,41 @@ project seed → unnumbered baseline artifacts). Specialization: `sdlc-for-agent
   Safety suite (disclaimer-drop / invent-ticker / personalized-advice) green in CI. **Human-User EXECUTE-EXIT approval granted — baseline buildout complete.**
 - **Artifact / path changed:** `reports/ux/nielsen-heuristics.md`, `.gitignore`
 - **Notes:** All W-1..W-8 delivered; app live and healthy. Final baseline-buildout gate closed. Later changes are Iterations (each with its own `seed/intent-<id>.md`).
+
+## 017
+- **Stage / task:** `execute/3b+3f` (per-work-item backfill)
+- **Approval gate:** —
+- **Timestamp (UTC):** 2026-10-05T22:40:00Z
+- **Approval outcome:** Approved
+- **Execution outcome:** Reconciles the batched EXECUTE entries (012–014) to the per-work-item / per-AC granularity the methodology expects (sdlc EXECUTE-EXIT conditions 1–2). All items built on the reused stock-guru base; code review (3c) on the shipped diff; no re-review findings outstanding.
+
+  **Per-work-item build (3b):**
+
+  | W-\<n\> | Built | Key paths |
+  |------|-------|-----------|
+  | W-1 identity-bootstrap | Federated credential `github-main-fresh` on CI UAMI + repo vars | Azure / GitHub vars |
+  | W-2 infra | Reuse-first new Container App | `infra/app.bicep` |
+  | W-3 movers | `MoversProvider` + seeded feed + MCP T-1 | `src/app/movers.py`, `mcp_server.py`, `data/` |
+  | W-4 eval | DIM-1..4 scorers + dataset + report writer; safety | `tests/eval/*`, `tests/safety/*` |
+  | W-5 agent | T-2 recommend: grounding/schema/cost/safety | `src/app/agent.py` |
+  | W-6 api | `/healthz`, `/api/movers`, `/api/recommend` | `src/app/main.py` |
+  | W-7 ui | Broadsheet dashboard (light/dark + toggle) + UI tests | `frontend/index.html`, `tests/ui/*` |
+  | W-8 cicd | test+ui→provision→deploy→smoke | `.github/workflows/deploy.yml` |
+
+  **Per-AC verification (3f):**
+
+  | AC | Work item | Evidence |
+  |----|-----------|----------|
+  | AC-1 | W-3 | `test_movers` green (CI) |
+  | AC-2 | W-5 | live: all recs ∈ movers; DIM-1 100% |
+  | AC-3 | W-5 | schema valid; DIM-2 100% |
+  | AC-4 | W-6/W-5 | disclaimer present; DIM-3 100% |
+  | AC-5 | W-4 | DIM-4 ≥ 80% (CI eval) |
+  | AC-6 | W-6 | live 200/422; movers/healthz 200 |
+  | AC-7 | W-5 | usage/cost metered; fail-closed (unit tests) |
+  | AC-8 | W-4 | N=20, DIM-1/2/3 100%, `reports/eval/` |
+  | AC-9 | W-7 | live render + rendered-UI tests |
+  | AC-10 | W-1/W-2/W-8 | OIDC deploy; `/healthz` 200 public |
+  | AC-11 | W-7/W-8 | axe clean both themes; scan 0; Nielsen 10/10 |
+- **Artifact / path changed:** `twtty/replay-execution/execution-log.md`
+- **Notes:** Documentation backfill only — no code change. Future runs should record 3b/3c/3f per work item live rather than batching.
